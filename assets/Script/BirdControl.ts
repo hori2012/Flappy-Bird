@@ -68,6 +68,4 @@ export default class BirdControl extends Component {
         this.mainControl.GameOver();
         this.playAudioDie();
     }
-
-
 }

@@ -83,7 +83,7 @@ export class MainControl extends Component {
         this.labelScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelHightScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelWeather.node.setSiblingIndex(this.node.children.length - 1);
-
+        this.heartUI.setSiblingIndex(this.node.children.length - 1);
     }
 
     onLoad() {
@@ -117,9 +117,9 @@ export class MainControl extends Component {
             birdRigidBody.enabled = false;
         }
         bird.active = false;
-
         this.ModeWeather();
     }
+
     onTouchStartBtn() {
         this.btnStart.node.active = false;
         this.gameStatus = GameStatus.Game_Playing;
@@ -185,9 +185,6 @@ export class MainControl extends Component {
             localStorage.setItem("hightScore", this.gameScore.toString());
         }
         bird.getComponent(BirdControl).nextPipeIndex = 0;
-        if (localStorage.getItem("hightScore") as unknown as number < this.gameScore) {
-            localStorage.setItem("hightScore", this.gameScore.toString());
-        }
         this.labelHightScore.string = "Hight score: " + localStorage.getItem("hightScore");
         this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2;
         this.node.getChildByName("Bird").getComponent(BirdControl).heart = 2;
@@ -254,7 +251,6 @@ export class MainControl extends Component {
             let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
             spGameOver.node.active = true;
             spGameOver.node.setSiblingIndex(this.node.children.length - 1);
-
             this.btnStart.node.active = false;
             this.btnReset.node.active = true;
             this.btnReset.node.setSiblingIndex(this.node.children.length - 1);
@@ -284,7 +280,7 @@ export class MainControl extends Component {
                 this.gameStatus = GameStatus.Game_Playing;
                 let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
                 spGameOver.node.active = false;
-
+                this.heartUI.children[this.node.getChildByName("Bird").getComponent(BirdControl).heart].active = false;
                 let bird = this.node.getChildByName("Bird");
                 let posBrid = bird.getPosition();
                 let nearPipeWithBird: Node = null;
