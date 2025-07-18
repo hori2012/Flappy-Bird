@@ -6,6 +6,7 @@ const { ccclass, property } = _decorator;
 export default class BirdControl extends Component {
 
     public speed: number = 0;
+    public jumforce: number = 2;
     mainControl: MainControl = null;
     start() {
         this.node.parent.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
@@ -58,7 +59,8 @@ export default class BirdControl extends Component {
     }
 
     onTouchStart(event: EventTouch) {
-        this.speed = 1.5;
+        // this.speed = 2;
+        this.speed = this.jumforce;
         this.playAudioFlap();
     }
 

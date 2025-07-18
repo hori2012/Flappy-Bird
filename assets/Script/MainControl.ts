@@ -2,7 +2,8 @@ import {
     _decorator, Component, Node, Sprite, Prefab, instantiate, PhysicsSystem2D, EPhysics2DDrawFlags, Button, RigidBody2D,
     Label,
     Collider2D,
-    Camera
+    Camera,
+    math
 
 } from 'cc';
 import BirdControl from './BirdControl';
@@ -293,20 +294,16 @@ export class MainControl extends Component {
             console.log("Speed current: ", this.node.getChildByName("Bird").getComponent(BirdControl).speed);
             if (isFlag) {
                 this.labelWeather.string = "Sunny";
-                if (this.node.getChildByName("Bird").getComponent(BirdControl).speed < 0) {
-                    this.node.getChildByName("Bird").getComponent(BirdControl).speed = this.node.getChildByName("Bird").getComponent(BirdControl).speed * 2;
-                } else {
-                    this.node.getChildByName("Bird").getComponent(BirdControl).speed = this.node.getChildByName("Bird").getComponent(BirdControl).speed / 2;
-                }
+                this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 1.5
                 console.log("Speed sunny: ", this.node.getChildByName("Bird").getComponent(BirdControl).speed);
             } else {
                 this.labelWeather.string = "Windy";
-                this.node.getChildByName("Bird").getComponent(BirdControl).speed = Math.abs(this.node.getChildByName("Bird").getComponent(BirdControl).speed) * 1.5;
+                this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2.5;
                 console.log("Speed windy: ", this.node.getChildByName("Bird").getComponent(BirdControl).speed);
             }
             isFlag = !isFlag;
         }
-        this.schedule(this.doActionWeatherMode, 5)
+        this.schedule(this.doActionWeatherMode, 10)
     }
 
     UnMode() {
