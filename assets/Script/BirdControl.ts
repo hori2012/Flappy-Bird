@@ -43,7 +43,7 @@ export default class BirdControl extends Component {
                 this.mainControl.gameScore++;
                 this.mainControl.labelScore.string = this.mainControl.gameScore.toString();
                 this.audioScore.playOneShot(this.audioScore.clip, 1);
-                console.log("Điểm số:", this.mainControl.gameScore);
+                // console.log("Điểm số:", this.mainControl.gameScore);
                 this.mainControl.pipe[this.nextPipeIndex][1] = true;
                 this.nextPipeIndex = (this.nextPipeIndex + 1) % this.mainControl.pipe.length;
             }
@@ -58,7 +58,7 @@ export default class BirdControl extends Component {
     }
 
     onTouchStart(event: EventTouch) {
-        this.speed = 2;
+        this.speed = 1.5;
         this.playAudioFlap();
     }
 

@@ -37,7 +37,7 @@ export class MainControl extends Component {
     doActionDarkMode: () => void;
     @property(Label)
     labelWeather: Label = null;
-    doActionLightMode: () => void;
+    doActionWeatherMode: () => void;
 
     start() {
         for (let i = 0; i < 3; i++) {
@@ -108,16 +108,6 @@ export class MainControl extends Component {
         this.labelWeather = this.node.getChildByName("Weather").getComponent(Label);
         this.darkmode = this.node.getChildByName("DarkUI").getComponent(Sprite);
         this.darkmode.node.active = false;
-        let isA = true;
-        this.doActionDarkMode = () => {
-            if (isA) {
-                this.ModeDark();
-            } else {
-                this.UnMode();
-            }
-            isA = !isA;
-        };
-        // this.schedule(this.doActionDarkMode, 2);
         // localStorage.setItem("hightScore", "0");
         if (localStorage.getItem("hightScore") === null) {
             localStorage.setItem("hightScore", "0");
@@ -129,6 +119,8 @@ export class MainControl extends Component {
             birdRigidBody.enabled = false;
         }
         bird.active = false;
+
+        this.ModeWeather();
     }
     onTouchStartBtn() {
         this.btnStart.node.active = false;
@@ -200,7 +192,7 @@ export class MainControl extends Component {
             localStorage.setItem("hightScore", this.gameScore.toString());
         }
         this.labelHightScore.string = "Hight score: " + localStorage.getItem("hightScore");
-        // this.schedule(this.doActionDarkMode, 2);
+        this.ModeWeather();
     }
 
     destroyAllPipes() {
@@ -279,15 +271,46 @@ export class MainControl extends Component {
         if (localStorage.getItem("hightScore") as unknown as number < this.gameScore) {
             localStorage.setItem("hightScore", this.gameScore.toString());
         }
-        console.log("hight score: ", localStorage.getItem("hightScore"));
-        // this.unschedule(this.doAction);
+        this.UnMode();
     }
+
     ModeDark() {
         this.darkmode.node.active = true;
+        let isFlag = true;
+        this.doActionDarkMode = () => {
+            if (isFlag) {
+                this.ModeDark();
+            } else {
+                this.UnMode();
+            }
+            isFlag = !isFlag;
+        };
     }
+
     ModeWeather() {
+        let isFlag = true;
+        this.doActionWeatherMode = () => {
+            console.log("Speed current: ", this.node.getChildByName("Bird").getComponent(BirdControl).speed);
+            if (isFlag) {
+                this.labelWeather.string = "Sunny";
+                if (this.node.getChildByName("Bird").getComponent(BirdControl).speed < 0) {
+                    this.node.getChildByName("Bird").getComponent(BirdControl).speed = this.node.getChildByName("Bird").getComponent(BirdControl).speed * 2;
+                } else {
+                    this.node.getChildByName("Bird").getComponent(BirdControl).speed = this.node.getChildByName("Bird").getComponent(BirdControl).speed / 2;
+                }
+                console.log("Speed sunny: ", this.node.getChildByName("Bird").getComponent(BirdControl).speed);
+            } else {
+                this.labelWeather.string = "Windy";
+                this.node.getChildByName("Bird").getComponent(BirdControl).speed = Math.abs(this.node.getChildByName("Bird").getComponent(BirdControl).speed) * 1.5;
+                console.log("Speed windy: ", this.node.getChildByName("Bird").getComponent(BirdControl).speed);
+            }
+            isFlag = !isFlag;
+        }
+        this.schedule(this.doActionWeatherMode, 5)
     }
+
     UnMode() {
-        this.darkmode.node.active = false;
+        this.unschedule(this.doActionDarkMode);
+        this.unschedule(this.doActionWeatherMode);
     }
 } 
