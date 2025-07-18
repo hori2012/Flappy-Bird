@@ -174,7 +174,7 @@ export class MainControl extends Component {
             pipeNode.setPosition(posNode);
             this.pipe.push([pipeNode, false]);
         }
-
+        this.getComponent(BirdControl).speed = 0;
         let bird = this.node.getChildByName("Bird");
         let posBrid = bird.getPosition();
         posBrid.y = 0;
@@ -242,7 +242,7 @@ export class MainControl extends Component {
             birdRigidBody.enabled = true;
         }
         bird.active = true;
-
+        this.getComponent(BirdControl).speed = 0;
         // Reset the isScore flag for all pipes when continuing
         for (let i = 0; i < this.pipe.length; i++) {
             const pipeData = this.pipe[i];
