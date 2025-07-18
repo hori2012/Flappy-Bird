@@ -35,7 +35,10 @@ export class MainControl extends Component {
     @property(Sprite)
     darkmode: Sprite = null;
     doActionDarkMode: () => void;
+    @property(Label)
+    labelWeather: Label = null;
     doActionLightMode: () => void;
+
     start() {
         for (let i = 0; i < 3; i++) {
             const pipeNode = instantiate(this.pipePrefab);
@@ -79,6 +82,7 @@ export class MainControl extends Component {
         }
         this.labelScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelHightScore.node.setSiblingIndex(this.node.children.length - 1);
+        this.labelWeather.node.setSiblingIndex(this.node.children.length - 1);
         this.darkmode.node.setSiblingIndex(this.node.children.length - 1);
     }
 
@@ -101,6 +105,7 @@ export class MainControl extends Component {
         this.btnContinue.node.active = false;
         this.labelScore = this.node.getChildByName("LabelScore").getComponent(Label);
         this.labelHightScore = this.node.getChildByName("LabelHightScore").getComponent(Label);
+        this.labelWeather = this.node.getChildByName("Weather").getComponent(Label);
         this.darkmode = this.node.getChildByName("DarkUI").getComponent(Sprite);
         this.darkmode.node.active = false;
         let isA = true;
@@ -174,7 +179,7 @@ export class MainControl extends Component {
             pipeNode.setPosition(posNode);
             this.pipe.push([pipeNode, false]);
         }
-        this.getComponent(BirdControl).speed = 0;
+        this.node.getChildByName("Bird").getComponent(BirdControl).speed = 0;
         let bird = this.node.getChildByName("Bird");
         let posBrid = bird.getPosition();
         posBrid.y = 0;
@@ -242,7 +247,7 @@ export class MainControl extends Component {
             birdRigidBody.enabled = true;
         }
         bird.active = true;
-        this.getComponent(BirdControl).speed = 0;
+        this.node.getChildByName("Bird").getComponent(BirdControl).speed = 0;
         // Reset the isScore flag for all pipes when continuing
         for (let i = 0; i < this.pipe.length; i++) {
             const pipeData = this.pipe[i];
@@ -281,7 +286,6 @@ export class MainControl extends Component {
         this.darkmode.node.active = true;
     }
     ModeWeather() {
-
     }
     UnMode() {
         this.darkmode.node.active = false;
