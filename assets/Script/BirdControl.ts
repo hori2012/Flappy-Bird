@@ -8,6 +8,15 @@ export default class BirdControl extends Component {
     public speed: number = 0;
     public jumforce: number = 2;
     mainControl: MainControl = null;
+    public heart: number = 2;
+    public nextPipeIndex: number = 0;
+    lastPipeX: number = null;
+    @property(AudioSource)
+    audioDie: AudioSource = null!;
+    @property(AudioSource)
+    audioScore: AudioSource = null!;
+    @property(AudioSource)
+    audioFlap: AudioSource = null!;
     start() {
         this.node.parent.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         let collider = this.node.getComponent(Collider2D);
@@ -24,15 +33,6 @@ export default class BirdControl extends Component {
             this.playAudioScore();
         }
     }
-
-    public nextPipeIndex: number = 0;
-    lastPipeX: number = null;
-    @property(AudioSource)
-    audioDie: AudioSource = null!;
-    @property(AudioSource)
-    audioScore: AudioSource = null!;
-    @property(AudioSource)
-    audioFlap: AudioSource = null!;
 
     playAudioScore() {
         let birdX = this.node.position.x;
@@ -66,6 +66,7 @@ export default class BirdControl extends Component {
 
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact) {
         this.speed = 0;
+        this.heart--;
         this.mainControl.GameOver();
         this.playAudioDie();
     }

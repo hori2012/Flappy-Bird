@@ -33,9 +33,6 @@ export class MainControl extends Component {
     gameStatus: GameStatus = GameStatus.Game_Ready;
     @property(Label)
     labelHightScore: Label = null;
-    @property(Sprite)
-    darkmode: Sprite = null;
-    doActionDarkMode: () => void;
     @property(Label)
     labelWeather: Label = null;
     doActionWeatherMode: () => void;
@@ -84,7 +81,6 @@ export class MainControl extends Component {
         this.labelScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelHightScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelWeather.node.setSiblingIndex(this.node.children.length - 1);
-        this.darkmode.node.setSiblingIndex(this.node.children.length - 1);
     }
 
     onLoad() {
@@ -107,8 +103,6 @@ export class MainControl extends Component {
         this.labelScore = this.node.getChildByName("LabelScore").getComponent(Label);
         this.labelHightScore = this.node.getChildByName("LabelHightScore").getComponent(Label);
         this.labelWeather = this.node.getChildByName("Weather").getComponent(Label);
-        this.darkmode = this.node.getChildByName("DarkUI").getComponent(Sprite);
-        this.darkmode.node.active = false;
         // localStorage.setItem("hightScore", "0");
         if (localStorage.getItem("hightScore") === null) {
             localStorage.setItem("hightScore", "0");
@@ -172,7 +166,7 @@ export class MainControl extends Component {
             pipeNode.setPosition(posNode);
             this.pipe.push([pipeNode, false]);
         }
-        this.node.getChildByName("Bird").getComponent(BirdControl).speed = 0;
+        this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 0;
         let bird = this.node.getChildByName("Bird");
         let posBrid = bird.getPosition();
         posBrid.y = 0;
@@ -240,7 +234,7 @@ export class MainControl extends Component {
             birdRigidBody.enabled = true;
         }
         bird.active = true;
-        this.node.getChildByName("Bird").getComponent(BirdControl).speed = 0;
+        this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 0;
         // Reset the isScore flag for all pipes when continuing
         for (let i = 0; i < this.pipe.length; i++) {
             const pipeData = this.pipe[i];
@@ -249,57 +243,82 @@ export class MainControl extends Component {
     }
 
     GameOver() {
-        let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
-        spGameOver.node.active = true;
-        spGameOver.node.setSiblingIndex(this.node.children.length - 1);
+        console.log("|Heart|: ", this.node.getChildByName("Bird").getComponent(BirdControl).heart)
+        if (this.node.getChildByName("Bird").getComponent(BirdControl).heart === 0) {
+            let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
+            spGameOver.node.active = true;
+            spGameOver.node.setSiblingIndex(this.node.children.length - 1);
 
-        this.btnStart.node.active = false;
-        this.btnReset.node.active = true;
-        this.btnReset.node.setSiblingIndex(this.node.children.length - 1);
-        this.btnContinue.node.active = true;
-        this.btnContinue.node.setSiblingIndex(this.node.children.length - 1);
-        this.gameStatus = GameStatus.Game_Over;
+            this.btnStart.node.active = false;
+            this.btnReset.node.active = true;
+            this.btnReset.node.setSiblingIndex(this.node.children.length - 1);
+            this.btnContinue.node.active = true;
+            this.btnContinue.node.setSiblingIndex(this.node.children.length - 1);
+            this.gameStatus = GameStatus.Game_Over;
 
-        this.scheduleOnce(() => {
-            let bird = this.node.getChildByName("Bird");
-            const birdRigidBody = bird.getComponent(RigidBody2D);
-            if (birdRigidBody) {
-                birdRigidBody.enabled = false;
+            this.scheduleOnce(() => {
+                let bird = this.node.getChildByName("Bird");
+                const birdRigidBody = bird.getComponent(RigidBody2D);
+                if (birdRigidBody) {
+                    birdRigidBody.enabled = false;
+                }
+            }, 0);
+
+            //update hight score in local
+            if (localStorage.getItem("hightScore") as unknown as number < this.gameScore) {
+                localStorage.setItem("hightScore", this.gameScore.toString());
             }
-        }, 0);
+            this.UnMode();
+        } else {
+            this.btnContinue.node.active = false;
+            this.btnStart.node.active = false;
+            this.btnReset.node.active = false;
+            this.gameStatus = GameStatus.Game_Playing;
+            let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
+            spGameOver.node.active = false;
 
-        //update hight score in local
-        if (localStorage.getItem("hightScore") as unknown as number < this.gameScore) {
-            localStorage.setItem("hightScore", this.gameScore.toString());
+            let bird = this.node.getChildByName("Bird");
+            let posBrid = bird.getPosition();
+            let nearPipeWithBird: Node = null;
+            let minDistanceX = Infinity;
+            for (let i = 0; i < this.pipe.length; i++) {
+                const currentPipe = this.pipe[i][0];
+                if (currentPipe.position.x > posBrid.x) {
+                    const distanceX = currentPipe.position.x - posBrid.x;
+                    if (distanceX < minDistanceX) {
+                        minDistanceX = distanceX;
+                        nearPipeWithBird = currentPipe;
+                    }
+                }
+            }
+            if (nearPipeWithBird) {
+                posBrid.y = nearPipeWithBird.position.y;
+            } else {
+                posBrid.y = 0;
+            }
+            bird.setPosition(posBrid);
+            bird.angle = 0;
+            // Reset the isScore flag for all pipes when continuing
+            for (let i = 0; i < this.pipe.length; i++) {
+                const pipeData = this.pipe[i];
+                this.pipe[i] = [pipeData[0], false];
+            }
         }
-        this.UnMode();
     }
 
     ModeDark() {
-        this.darkmode.node.active = true;
-        let isFlag = true;
-        this.doActionDarkMode = () => {
-            if (isFlag) {
-                this.ModeDark();
-            } else {
-                this.UnMode();
-            }
-            isFlag = !isFlag;
-        };
+
     }
 
     ModeWeather() {
         let isFlag = true;
         this.doActionWeatherMode = () => {
-            console.log("Speed current: ", this.node.getChildByName("Bird").getComponent(BirdControl).speed);
             if (isFlag) {
                 this.labelWeather.string = "Sunny";
                 this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 1.5
-                console.log("Speed sunny: ", this.node.getChildByName("Bird").getComponent(BirdControl).speed);
             } else {
                 this.labelWeather.string = "Windy";
                 this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2.5;
-                console.log("Speed windy: ", this.node.getChildByName("Bird").getComponent(BirdControl).speed);
             }
             isFlag = !isFlag;
         }
@@ -307,7 +326,6 @@ export class MainControl extends Component {
     }
 
     UnMode() {
-        this.unschedule(this.doActionDarkMode);
         this.unschedule(this.doActionWeatherMode);
     }
 } 
