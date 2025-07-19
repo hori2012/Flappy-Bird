@@ -8,7 +8,7 @@ export default class BirdControl extends Component {
     public speed: number = 0;
     public jumforce: number = 2;
     mainControl: MainControl = null;
-    public heart: number = 2;
+    public heart: number = 3;
     public nextPipeIndex: number = 0;
     lastPipeX: number = null;
     @property(AudioSource)
@@ -63,9 +63,12 @@ export default class BirdControl extends Component {
     }
 
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact) {
-        this.speed = 0;
-        this.heart--;
-        this.mainControl.GameOver();
-        this.playAudioDie();
+        if (otherCollider.tag === 0) {
+            // this.speed = 0;
+            this.heart--;
+            console.log("So mang con lai : ", this.heart);
+            this.mainControl.GameOver();
+            this.playAudioDie();
+        }
     }
 }

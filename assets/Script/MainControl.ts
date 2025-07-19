@@ -38,7 +38,8 @@ export class MainControl extends Component {
     doActionWeatherMode: () => void;
     @property(Node)
     heartUI: Node = null;
-
+    @property(Node)
+    heartItem: Node = null!;
     start() {
         for (let i = 0; i < 3; i++) {
             const pipeNode = instantiate(this.pipePrefab);
@@ -80,10 +81,19 @@ export class MainControl extends Component {
             pipeData[0].setPosition(posPipe);
             this.pipe[i] = [pipeData[0], false];
         }
+        if (this.heartItem.active) {
+            const pos = this.heartItem.getPosition();
+            pos.x -= deltaTime * 100;
+            this.heartItem.setPosition(pos);
+            if (pos.x < -200) {
+                this.heartItem.active = false;
+            }
+        }
         this.labelScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelHightScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelWeather.node.setSiblingIndex(this.node.children.length - 1);
         this.heartUI.setSiblingIndex(this.node.children.length - 1);
+        this.heartItem.setSiblingIndex(this.node.children.length - 1);
     }
 
     onLoad() {
@@ -93,7 +103,6 @@ export class MainControl extends Component {
 
         let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
         spGameOver.node.active = false;
-
         this.btnStart = this.node.getChildByName("BtnStart").getComponent(Button);
         this.btnStart.node.on(Node.EventType.TOUCH_END, this.onTouchStartBtn, this);
         this.btnStart.node.active = true;
@@ -106,6 +115,8 @@ export class MainControl extends Component {
         this.labelScore = this.node.getChildByName("LabelScore").getComponent(Label);
         this.labelHightScore = this.node.getChildByName("LabelHightScore").getComponent(Label);
         this.labelWeather = this.node.getChildByName("Weather").getComponent(Label);
+        this.heartItem = this.node.getChildByName("HeartItem");
+        this.heartItem.active = false;
         // localStorage.setItem("hightScore", "0");
         if (localStorage.getItem("hightScore") === null) {
             localStorage.setItem("hightScore", "0");
@@ -118,6 +129,7 @@ export class MainControl extends Component {
         }
         bird.active = false;
         this.ModeWeather();
+        this.schedule(() => this.SpawItem(), 5);
     }
 
     onTouchStartBtn() {
@@ -135,7 +147,6 @@ export class MainControl extends Component {
             pipeData[0].setPosition(posPipe);
             this.pipe[i] = [pipeData[0], false];
         }
-
         let bird = this.node.getChildByName("Bird");
         let posBrid = bird.getPosition();
         posBrid.y = 0;
@@ -149,14 +160,15 @@ export class MainControl extends Component {
         this.gameScore = 0;
         this.labelScore.string = this.gameScore.toString();
     }
+
     onTouchResetBtn() {
         this.btnStart.node.active = false;
         this.btnReset.node.active = false;
         this.btnContinue.node.active = false;
+        this.heartItem.active = false;
         this.gameStatus = GameStatus.Game_Playing;
         let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
         spGameOver.node.active = false;
-
         this.destroyAllPipes()
         for (let i = 0; i < 3; i++) {
             const pipeNode = instantiate(this.pipePrefab);
@@ -187,7 +199,11 @@ export class MainControl extends Component {
         bird.getComponent(BirdControl).nextPipeIndex = 0;
         this.labelHightScore.string = "Hight score: " + localStorage.getItem("hightScore");
         this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2;
-        this.node.getChildByName("Bird").getComponent(BirdControl).heart = 2;
+        this.node.getChildByName("Bird").getComponent(BirdControl).heart = 3;
+        for (let i = 0; i < this.heartUI.children.length; i++) {
+            this.heartUI.children[i].active = true;
+        }
+        this.UnMode();
         this.labelWeather.string = "Weather";
         this.ModeWeather();
     }
@@ -246,7 +262,6 @@ export class MainControl extends Component {
     }
 
     GameOver() {
-        console.log("|Heart|: ", this.node.getChildByName("Bird").getComponent(BirdControl).heart)
         if (this.node.getChildByName("Bird").getComponent(BirdControl).heart === 0) {
             let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
             spGameOver.node.active = true;
@@ -254,8 +269,7 @@ export class MainControl extends Component {
             this.btnStart.node.active = false;
             this.btnReset.node.active = true;
             this.btnReset.node.setSiblingIndex(this.node.children.length - 1);
-            // this.btnContinue.node.active = true;
-            // this.btnContinue.node.setSiblingIndex(this.node.children.length - 1);
+            this.heartUI.children[this.node.getChildByName("Bird").getComponent(BirdControl).heart].active = false;
             this.gameStatus = GameStatus.Game_Over;
 
             this.scheduleOnce(() => {
@@ -308,7 +322,6 @@ export class MainControl extends Component {
                     const pipeData = this.pipe[i];
                     this.pipe[i] = [pipeData[0], false];
                 }
-                // this.ModeWeather();
             }, 0);
 
         }
@@ -326,10 +339,23 @@ export class MainControl extends Component {
             }
             isFlag = !isFlag;
         }
-        this.schedule(this.doActionWeatherMode, 5)
+        this.schedule(this.doActionWeatherMode, 10)
     }
 
     UnMode() {
+        this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2;
         this.unschedule(this.doActionWeatherMode);
+    }
+
+    SpawItem() {
+        if (!this.heartItem.active)
+            for (let i = 0; i < this.pipe.length; i++) {
+                let pipeData = this.pipe[i];
+                if (!pipeData[1] && pipeData[0].position.x > 0) {
+                    this.heartItem.setPosition(pipeData[0].position.x, pipeData[0].position.y);
+                    this.heartItem.active = true;
+                    return;
+                }
+            }
     }
 } 
