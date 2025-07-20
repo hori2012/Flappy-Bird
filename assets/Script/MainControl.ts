@@ -40,6 +40,12 @@ export class MainControl extends Component {
     heartUI: Node = null;
     @property(Node)
     heartItem: Node = null!;
+    @property(Node)
+    gravityItem: Node = null!;
+    @property(Node)
+    bombItem: Node = null!;
+    @property(Node)
+    ghostItem: Node = null!;
     start() {
         for (let i = 0; i < 3; i++) {
             const pipeNode = instantiate(this.pipePrefab);
@@ -89,11 +95,20 @@ export class MainControl extends Component {
                 this.heartItem.active = false;
             }
         }
+        if (this.gravityItem.active) {
+            const pos = this.gravityItem.getPosition();
+            pos.x -= deltaTime * 100;
+            this.gravityItem.setPosition(pos);
+            if (pos.x < -200) {
+                this.gravityItem.active = false;
+            }
+        }
         this.labelScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelHightScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelWeather.node.setSiblingIndex(this.node.children.length - 1);
         this.heartUI.setSiblingIndex(this.node.children.length - 1);
         this.heartItem.setSiblingIndex(this.node.children.length - 1);
+        this.gravityItem.setSiblingIndex(this.node.children.length - 1);
     }
 
     onLoad() {
@@ -117,6 +132,8 @@ export class MainControl extends Component {
         this.labelWeather = this.node.getChildByName("Weather").getComponent(Label);
         this.heartItem = this.node.getChildByName("HeartItem");
         this.heartItem.active = false;
+        this.gravityItem = this.node.getChildByName("GravityItem");
+        this.gravityItem.active = false;
         // localStorage.setItem("hightScore", "0");
         if (localStorage.getItem("hightScore") === null) {
             localStorage.setItem("hightScore", "0");
@@ -200,6 +217,7 @@ export class MainControl extends Component {
         this.labelHightScore.string = "Hight score: " + localStorage.getItem("hightScore");
         this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2;
         this.node.getChildByName("Bird").getComponent(BirdControl).heart = 3;
+        this.node.getChildByName("Bird").getComponent(BirdControl).isGravityReversed = false;
         for (let i = 0; i < this.heartUI.children.length; i++) {
             this.heartUI.children[i].active = true;
         }
@@ -316,7 +334,6 @@ export class MainControl extends Component {
                 }
                 bird.setPosition(posBrid);
                 bird.angle = 0;
-
                 // Reset the isScore flag for all pipes when continuing
                 for (let i = 0; i < this.pipe.length; i++) {
                     const pipeData = this.pipe[i];
@@ -328,16 +345,24 @@ export class MainControl extends Component {
     }
 
     ModeWeather() {
-        let isFlag = true;
+        let isFlag = 0;
         this.doActionWeatherMode = () => {
-            if (isFlag) {
+            if (isFlag === 0) {
+                this.labelWeather.string = "Normal";
+                this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2;
+                isFlag += 1;
+            }
+            else if (isFlag == 1) {
                 this.labelWeather.string = "Sunny";
                 this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 1.5
-            } else {
+                isFlag += 1;
+            } else if (isFlag === 2) {
                 this.labelWeather.string = "Windy";
                 this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2.5;
+                isFlag += 1;
+            } else if (isFlag >= 3) {
+                isFlag = 0;
             }
-            isFlag = !isFlag;
         }
         this.schedule(this.doActionWeatherMode, 10)
     }
@@ -348,14 +373,28 @@ export class MainControl extends Component {
     }
 
     SpawItem() {
-        if (!this.heartItem.active)
-            for (let i = 0; i < this.pipe.length; i++) {
-                let pipeData = this.pipe[i];
-                if (!pipeData[1] && pipeData[0].position.x > 0) {
-                    this.heartItem.setPosition(pipeData[0].position.x, pipeData[0].position.y);
-                    this.heartItem.active = true;
-                    return;
-                }
-            }
+        let numRandom = Math.floor(Math.random() * 2);
+        switch (numRandom) {
+            case 0:
+                if (!this.heartItem.active)
+                    for (let i = 0; i < this.pipe.length; i++) {
+                        let pipeData = this.pipe[i];
+                        if (!pipeData[1] && pipeData[0].position.x > 0) {
+                            this.heartItem.setPosition(pipeData[0].position.x, pipeData[0].position.y);
+                            this.heartItem.active = true;
+                            return;
+                        }
+                    }
+            case 1:
+                if (!this.gravityItem.active)
+                    for (let i = 0; i < this.pipe.length; i++) {
+                        let pipeData = this.pipe[i];
+                        if (!pipeData[1] && pipeData[0].position.x > 0) {
+                            this.gravityItem.setPosition(pipeData[0].position.x, pipeData[0].position.y);
+                            this.gravityItem.active = true;
+                            return;
+                        }
+                    }
+        }
     }
 } 

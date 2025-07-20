@@ -10,6 +10,7 @@ export default class BirdControl extends Component {
     mainControl: MainControl = null;
     public heart: number = 3;
     public nextPipeIndex: number = 0;
+    public isGravityReversed: boolean = false;
     lastPipeX: number = null;
     @property(AudioSource)
     audioDie: AudioSource = null!;
@@ -28,7 +29,11 @@ export default class BirdControl extends Component {
 
     update(dt: number) {
         if (this.mainControl.gameStatus === GameStatus.Game_Playing) {
-            this.speed -= 0.05;
+            if (this.isGravityReversed) {
+                this.speed += 0.05;
+            } else {
+                this.speed -= 0.05;
+            }
             this.node.setPosition(this.node.position.x, this.node.position.y + this.speed);
             this.playAudioScore();
         }
@@ -58,13 +63,12 @@ export default class BirdControl extends Component {
     }
 
     onTouchStart(event: EventTouch) {
-        this.speed = this.jumforce;
+        this.speed = this.isGravityReversed ? -this.jumforce : this.jumforce;
         this.playAudioFlap();
     }
 
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact) {
-        if (otherCollider.tag === 0) {
-            // this.speed = 0;
+        if (otherCollider.tag === 0 || otherCollider.tag === 2) {
             this.heart--;
             console.log("So mang con lai : ", this.heart);
             this.mainControl.GameOver();

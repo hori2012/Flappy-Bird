@@ -1,10 +1,10 @@
 import { _decorator, AudioSource, Collider2D, Component, Contact2DType, Node } from 'cc';
-import { MainControl } from './MainControl';
 import BirdControl from './BirdControl';
+import { MainControl } from './MainControl';
 const { ccclass, property } = _decorator;
 
-@ccclass('HeartItem')
-export class HeartItem extends Component {
+@ccclass('GravityItem')
+export class GravityItem extends Component {
     @property(AudioSource)
     audioPick: AudioSource = null!;
     mainControl: MainControl = null;
@@ -21,12 +21,12 @@ export class HeartItem extends Component {
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
         this.scheduleOnce(() => {
             this.audioPick.playOneShot(this.audioPick.clip, 1);
-            this.mainControl.heartItem.active = false;
-            if (this.birtControl.heart < 3) {
-                this.birtControl.heart += 1;
-                this.mainControl.heartUI.children[this.birtControl.heart - 1].active = true;
-            }
-            console.log("So mang sau khi lay : ", this.birtControl.heart);
+            this.mainControl.gravityItem.active = false;
+            this.birtControl.isGravityReversed = true;
+            this.scheduleOnce(() => {
+                this.birtControl.isGravityReversed = false;
+            }, 5);
+            console.log("Trang thai grivity sau 5s:", this.birtControl.isGravityReversed);
         }, 0);
     }
 }
