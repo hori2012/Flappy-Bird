@@ -3,8 +3,8 @@ import BirdControl from './BirdControl';
 import { MainControl } from './MainControl';
 const { ccclass, property } = _decorator;
 
-@ccclass('BombItem')
-export class BombItem extends Component {
+@ccclass('GhostItem')
+export class GhostItem extends Component {
 
     @property(AudioSource)
     audioPick: AudioSource = null!;
@@ -22,20 +22,19 @@ export class BombItem extends Component {
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
         this.scheduleOnce(() => {
             this.audioPick.playOneShot(this.audioPick.clip, 1);
-            this.mainControl.bombItem.active = false;
-            this.mainControl.destroyAllPipes();
-            this.birdControl.nextPipeIndex = 0;
-            this.mainControl.scheduleOnce(() => {
-                for (let i = 0; i < 3; i++) {
-                    const pipeNode = instantiate(this.mainControl.pipePrefab);
-                    this.mainControl.node.addChild(pipeNode);
-                    const posNode = pipeNode.getPosition();
-                    posNode.x = 170 + 200 * i;
-                    var minY = -120;
-                    var maxY = 120;
-                    posNode.y = minY + Math.random() * (maxY - minY);
-                    pipeNode.setPosition(posNode);
-                    this.mainControl.pipe.push([pipeNode, false]);
+            this.mainControl.ghostItem.active = false;
+            for (let i = 0; i < this.mainControl.pipe.length; i++) {
+                let pipeCollider = this.mainControl.pipe[i][0].getComponentsInChildren(Collider2D);
+                for (let c of pipeCollider) {
+                    c.enabled = false;
+                }
+            }
+            this.scheduleOnce(() => {
+                for (let i = 0; i < this.mainControl.pipe.length; i++) {
+                    let pipeCollider = this.mainControl.pipe[i][0].getComponentsInChildren(Collider2D);
+                    for (let c of pipeCollider) {
+                        c.enabled = true;
+                    }
                 }
             }, 5);
         }, 0);

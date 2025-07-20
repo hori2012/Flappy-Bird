@@ -9,7 +9,7 @@ export class GravityItem extends Component {
     @property(AudioSource)
     audioPick: AudioSource = null!;
     mainControl: MainControl = null;
-    birtControl: BirdControl = null;
+    birdControl: BirdControl = null;
 
     start() {
         let collider = this.node.getComponent(Collider2D);
@@ -17,17 +17,17 @@ export class GravityItem extends Component {
             collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this)
         }
         this.mainControl = this.node.parent.getComponent(MainControl);
-        this.birtControl = this.node.parent.getChildByName("Bird").getComponent(BirdControl);
+        this.birdControl = this.node.parent.getChildByName("Bird").getComponent(BirdControl);
     }
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
         this.scheduleOnce(() => {
             this.audioPick.playOneShot(this.audioPick.clip, 1);
             this.mainControl.gravityItem.active = false;
-            this.birtControl.isGravityReversed = true;
+            this.birdControl.isGravityReversed = true;
             this.scheduleOnce(() => {
-                this.birtControl.isGravityReversed = false;
+                this.birdControl.isGravityReversed = false;
             }, 5);
-            console.log("Trang thai grivity sau 5s:", this.birtControl.isGravityReversed);
+            console.log("Trang thai grivity sau 5s:", this.birdControl.isGravityReversed);
         }, 0);
     }
 }

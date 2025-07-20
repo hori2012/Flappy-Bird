@@ -70,7 +70,6 @@ export default class BirdControl extends Component {
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact) {
         if (otherCollider.tag === 0 || otherCollider.tag === 2) {
             this.heart--;
-            console.log("So mang con lai : ", this.heart);
             this.mainControl.GameOver();
             this.playAudioDie();
         }

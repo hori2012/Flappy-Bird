@@ -9,7 +9,7 @@ export class HeartItem extends Component {
     @property(AudioSource)
     audioPick: AudioSource = null!;
     mainControl: MainControl = null;
-    birtControl: BirdControl = null;
+    birdControl: BirdControl = null;
 
     start() {
         let collider = this.node.getComponent(Collider2D);
@@ -17,17 +17,17 @@ export class HeartItem extends Component {
             collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this)
         }
         this.mainControl = this.node.parent.getComponent(MainControl);
-        this.birtControl = this.node.parent.getChildByName("Bird").getComponent(BirdControl);
+        this.birdControl = this.node.parent.getChildByName("Bird").getComponent(BirdControl);
     }
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
         this.scheduleOnce(() => {
             this.audioPick.playOneShot(this.audioPick.clip, 1);
             this.mainControl.heartItem.active = false;
-            if (this.birtControl.heart < 3) {
-                this.birtControl.heart += 1;
-                this.mainControl.heartUI.children[this.birtControl.heart - 1].active = true;
+            if (this.birdControl.heart < 3) {
+                this.birdControl.heart += 1;
+                this.mainControl.heartUI.children[this.birdControl.heart - 1].active = true;
             }
-            console.log("So mang sau khi lay : ", this.birtControl.heart);
+            console.log("So mang sau khi lay : ", this.birdControl.heart);
         }, 0);
     }
 }

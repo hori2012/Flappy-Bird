@@ -47,17 +47,8 @@ export class MainControl extends Component {
     @property(Node)
     ghostItem: Node = null!;
     start() {
-        for (let i = 0; i < 3; i++) {
-            const pipeNode = instantiate(this.pipePrefab);
-            this.node.addChild(pipeNode);
-            const posNode = pipeNode.getPosition();
-            posNode.x = 170 + 200 * i;
-            var minY = -120;
-            var maxY = 120;
-            posNode.y = minY + Math.random() * (maxY - minY);
-            pipeNode.setPosition(posNode);
-            this.pipe.push([pipeNode, false]);
-        }
+        this.ModeWeather();
+        this.schedule(() => this.SpawItem(), 5);
     }
 
     update(deltaTime: number) {
@@ -111,6 +102,14 @@ export class MainControl extends Component {
                 this.bombItem.active = false;
             }
         }
+        if (this.ghostItem.active) {
+            const pos = this.ghostItem.getPosition();
+            pos.x -= deltaTime * 100;
+            this.ghostItem.setPosition(pos);
+            if (pos.x < -200) {
+                this.ghostItem.active = false;
+            }
+        }
         this.labelScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelHightScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelWeather.node.setSiblingIndex(this.node.children.length - 1);
@@ -143,6 +142,8 @@ export class MainControl extends Component {
         this.gravityItem.active = false;
         this.bombItem = this.node.getChildByName("BombItem");
         this.bombItem.active = false;
+        this.ghostItem = this.node.getChildByName("GhostItem");
+        this.ghostItem.active = false;
         // localStorage.setItem("hightScore", "0");
         if (localStorage.getItem("hightScore") === null) {
             localStorage.setItem("hightScore", "0");
@@ -154,11 +155,21 @@ export class MainControl extends Component {
             birdRigidBody.enabled = false;
         }
         bird.active = false;
-        this.ModeWeather();
-        this.schedule(() => this.SpawItem(), 5);
     }
 
     onTouchStartBtn() {
+        //created pipe
+        for (let i = 0; i < 3; i++) {
+            const pipeNode = instantiate(this.pipePrefab);
+            this.node.addChild(pipeNode);
+            const posNode = pipeNode.getPosition();
+            posNode.x = 170 + 200 * i;
+            var minY = -120;
+            var maxY = 120;
+            posNode.y = minY + Math.random() * (maxY - minY);
+            pipeNode.setPosition(posNode);
+            this.pipe.push([pipeNode, false]);
+        }
         this.btnStart.node.active = false;
         this.gameStatus = GameStatus.Game_Playing;
         let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
@@ -213,6 +224,7 @@ export class MainControl extends Component {
             let bird = this.node.getChildByName("Bird");
             let posBrid = bird.getPosition();
             posBrid.y = 0;
+            posBrid.x = 0;
             bird.setPosition(posBrid);
             bird.angle = 0;
             bird.active = true;
@@ -227,7 +239,7 @@ export class MainControl extends Component {
             }
             bird.getComponent(BirdControl).nextPipeIndex = 0;
             this.labelHightScore.string = "Hight score: " + localStorage.getItem("hightScore");
-            this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2;
+            this.node.getChildByName("Bird").getComponent(BirdControl).speed = 0;
             this.node.getChildByName("Bird").getComponent(BirdControl).heart = 3;
             this.node.getChildByName("Bird").getComponent(BirdControl).isGravityReversed = false;
             for (let i = 0; i < this.heartUI.children.length; i++) {
@@ -347,6 +359,7 @@ export class MainControl extends Component {
                 }
                 bird.setPosition(posBrid);
                 bird.angle = 0;
+                this.node.getChildByName("Bird").getComponent(BirdControl).speed = 0;
                 // Reset the isScore flag for all pipes when continuing
                 for (let i = 0; i < this.pipe.length; i++) {
                     const pipeData = this.pipe[i];
@@ -387,6 +400,7 @@ export class MainControl extends Component {
 
     SpawItem() {
         let numRandom = Math.floor(Math.random() * 4);
+        // let numRandom = 3;
         switch (numRandom) {
             case 0:
                 if (!this.heartItem.active)
@@ -422,6 +436,15 @@ export class MainControl extends Component {
                     }
                 break;
             default:
+                if (!this.ghostItem.active)
+                    for (let i = 0; i < this.pipe.length; i++) {
+                        let pipeData = this.pipe[i];
+                        if (!pipeData[1] && pipeData[0].position.x > 0) {
+                            this.ghostItem.setPosition(pipeData[0].position.x, pipeData[0].position.y);
+                            this.ghostItem.active = true;
+                            return;
+                        }
+                    }
                 break;
         }
     }
