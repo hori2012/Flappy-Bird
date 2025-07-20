@@ -1,6 +1,6 @@
 import { _decorator, AudioSource, Collider2D, Component, Contact2DType, instantiate, Node } from 'cc';
 import BirdControl from './BirdControl';
-import { MainControl } from './MainControl';
+import { GameStatus, MainControl } from './MainControl';
 const { ccclass, property } = _decorator;
 
 @ccclass('BombItem')
@@ -20,6 +20,7 @@ export class BombItem extends Component {
         this.birdControl = this.node.parent.getChildByName("Bird").getComponent(BirdControl);
     }
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
+        if (this.mainControl.gameStatus !== GameStatus.Game_Playing) return;
         this.scheduleOnce(() => {
             this.audioPick.playOneShot(this.audioPick.clip, 1);
             this.mainControl.bombItem.active = false;
@@ -40,7 +41,7 @@ export class BombItem extends Component {
                 }
                 this.mainControl.bombUI.active = false;
                 console.log("Het trang thai bomb");
-            }, 5);
+            }, 6);
         }, 0);
     }
 }

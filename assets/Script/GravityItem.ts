@@ -1,6 +1,6 @@
 import { _decorator, AudioSource, Collider2D, Component, Contact2DType, Node } from 'cc';
 import BirdControl from './BirdControl';
-import { MainControl } from './MainControl';
+import { GameStatus, MainControl } from './MainControl';
 const { ccclass, property } = _decorator;
 
 @ccclass('GravityItem')
@@ -20,6 +20,7 @@ export class GravityItem extends Component {
         this.birdControl = this.node.parent.getChildByName("Bird").getComponent(BirdControl);
     }
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
+        if (this.mainControl.gameStatus !== GameStatus.Game_Playing) return;
         this.scheduleOnce(() => {
             this.audioPick.playOneShot(this.audioPick.clip, 1);
             this.mainControl.gravityItem.active = false;
@@ -29,7 +30,7 @@ export class GravityItem extends Component {
                 this.birdControl.isGravityReversed = false;
                 this.mainControl.gravityUI.active = false;
                 console.log("Het trang thai gravity");
-            }, 5);
+            }, 8);
         }, 0);
     }
 }

@@ -54,7 +54,7 @@ export class MainControl extends Component {
     ghostItem: Node = null!;
     start() {
         this.ModeWeather();
-        this.schedule(() => this.SpawItem(), 20);
+        this.schedule(() => this.SpawItem(), 15);
     }
 
     update(deltaTime: number) {
@@ -343,6 +343,7 @@ export class MainControl extends Component {
                 localStorage.setItem("hightScore", this.gameScore.toString());
             }
             this.UnMode();
+            this.unschedule(this.SpawItem());
         }
         else {
             this.scheduleOnce(() => {
@@ -414,7 +415,8 @@ export class MainControl extends Component {
     }
 
     SpawItem() {
-        let numRandom = Math.floor(Math.random() * 2);
+        if (this.gameStatus !== GameStatus.Game_Playing) return;
+        let numRandom = Math.floor(Math.random() * 4);
         // let numRandom = 1;
         switch (numRandom) {
             case 0:
