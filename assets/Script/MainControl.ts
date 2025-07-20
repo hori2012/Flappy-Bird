@@ -261,7 +261,7 @@ export class MainControl extends Component {
                 this.heartUI.children[i].active = true;
             }
             this.UnMode();
-            this.labelWeather.string = "Weather";
+            this.labelWeather.string = "Normal";
             this.ModeWeather();
         }, 0);
     }
