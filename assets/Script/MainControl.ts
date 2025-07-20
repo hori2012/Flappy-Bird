@@ -41,14 +41,20 @@ export class MainControl extends Component {
     @property(Node)
     heartItem: Node = null!;
     @property(Node)
+    gravityUI: Node = null;
+    @property(Node)
     gravityItem: Node = null!;
     @property(Node)
+    bombUI: Node = null;
+    @property(Node)
     bombItem: Node = null!;
+    @property(Node)
+    ghostUI: Node = null;
     @property(Node)
     ghostItem: Node = null!;
     start() {
         this.ModeWeather();
-        this.schedule(() => this.SpawItem(), 5);
+        this.schedule(() => this.SpawItem(), 15);
     }
 
     update(deltaTime: number) {
@@ -114,6 +120,9 @@ export class MainControl extends Component {
         this.labelHightScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelWeather.node.setSiblingIndex(this.node.children.length - 1);
         this.heartUI.setSiblingIndex(this.node.children.length - 1);
+        this.gravityUI.setSiblingIndex(this.node.children.length - 1);
+        this.bombUI.setSiblingIndex(this.node.children.length - 1);
+        this.ghostUI.setSiblingIndex(this.node.children.length - 1);
         this.heartItem.setSiblingIndex(this.node.children.length - 1);
     }
 
@@ -144,6 +153,9 @@ export class MainControl extends Component {
         this.bombItem.active = false;
         this.ghostItem = this.node.getChildByName("GhostItem");
         this.ghostItem.active = false;
+        this.gravityUI.active = false;
+        this.bombUI.active = false;
+        this.ghostUI.active = false;
         // localStorage.setItem("hightScore", "0");
         if (localStorage.getItem("hightScore") === null) {
             localStorage.setItem("hightScore", "0");
@@ -400,7 +412,7 @@ export class MainControl extends Component {
 
     SpawItem() {
         let numRandom = Math.floor(Math.random() * 4);
-        // let numRandom = 3;
+        // let numRandom = 1;
         switch (numRandom) {
             case 0:
                 if (!this.heartItem.active)

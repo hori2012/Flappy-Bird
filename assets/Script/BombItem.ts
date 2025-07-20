@@ -25,6 +25,7 @@ export class BombItem extends Component {
             this.mainControl.bombItem.active = false;
             this.mainControl.destroyAllPipes();
             this.birdControl.nextPipeIndex = 0;
+            this.mainControl.bombUI.active = true;
             this.mainControl.scheduleOnce(() => {
                 for (let i = 0; i < 3; i++) {
                     const pipeNode = instantiate(this.mainControl.pipePrefab);
@@ -37,6 +38,7 @@ export class BombItem extends Component {
                     pipeNode.setPosition(posNode);
                     this.mainControl.pipe.push([pipeNode, false]);
                 }
+                this.mainControl.bombUI.active = false;
             }, 5);
         }, 0);
     }

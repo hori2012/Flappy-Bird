@@ -4616,13 +4616,24 @@
     "heartItem": {
       "__id__": 77
     },
+    "gravityUI": {
+      "__id__": 105
+    },
     "gravityItem": {
       "__id__": 84
+    },
+    "bombUI": {
+      "__id__": 112
     },
     "bombItem": {
       "__id__": 91
     },
-    "ghostItem": null,
+    "ghostUI": {
+      "__id__": 119
+    },
+    "ghostItem": {
+      "__id__": 98
+    },
     "_id": "05JhQrgORNeqg1x7lPjSlN"
   },
   {

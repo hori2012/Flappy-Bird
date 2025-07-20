@@ -23,6 +23,7 @@ export class GhostItem extends Component {
         this.scheduleOnce(() => {
             this.audioPick.playOneShot(this.audioPick.clip, 1);
             this.mainControl.ghostItem.active = false;
+            this.mainControl.ghostUI.active = true;
             for (let i = 0; i < this.mainControl.pipe.length; i++) {
                 let pipeCollider = this.mainControl.pipe[i][0].getComponentsInChildren(Collider2D);
                 for (let c of pipeCollider) {
@@ -36,6 +37,7 @@ export class GhostItem extends Component {
                         c.enabled = true;
                     }
                 }
+                this.mainControl.ghostUI.active = false;
             }, 5);
         }, 0);
     }

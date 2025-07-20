@@ -24,8 +24,10 @@ export class GravityItem extends Component {
             this.audioPick.playOneShot(this.audioPick.clip, 1);
             this.mainControl.gravityItem.active = false;
             this.birdControl.isGravityReversed = true;
+            this.mainControl.gravityUI.active = true;
             this.scheduleOnce(() => {
                 this.birdControl.isGravityReversed = false;
+                this.mainControl.gravityUI.active = false;
             }, 5);
             console.log("Trang thai grivity sau 5s:", this.birdControl.isGravityReversed);
         }, 0);
