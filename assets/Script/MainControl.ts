@@ -54,7 +54,7 @@ export class MainControl extends Component {
     ghostItem: Node = null!;
     start() {
         this.ModeWeather();
-        this.schedule(() => this.SpawItem(), 15);
+        this.schedule(() => this.SpawItem(), 20);
     }
 
     update(deltaTime: number) {
@@ -65,8 +65,8 @@ export class MainControl extends Component {
             const node = this.spBg[i].node;
             const pos = node.getPosition();
             pos.x -= deltaTime * 100;
-            if (pos.x <= -280) {
-                pos.x = 280;
+            if (pos.x <= -288) {
+                pos.x = 288;
             }
             node.setPosition(pos);
         }
@@ -218,6 +218,9 @@ export class MainControl extends Component {
             this.heartItem.active = false;
             this.gravityItem.active = false;
             this.bombItem.active = false;
+            this.gravityUI.active = false;
+            this.bombUI.active = false;
+            this.ghostUI.active = false;
             this.gameStatus = GameStatus.Game_Playing;
             let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
             spGameOver.node.active = false;
@@ -411,7 +414,7 @@ export class MainControl extends Component {
     }
 
     SpawItem() {
-        let numRandom = Math.floor(Math.random() * 4);
+        let numRandom = Math.floor(Math.random() * 2);
         // let numRandom = 1;
         switch (numRandom) {
             case 0:

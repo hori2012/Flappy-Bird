@@ -25,11 +25,11 @@ export class GravityItem extends Component {
             this.mainControl.gravityItem.active = false;
             this.birdControl.isGravityReversed = true;
             this.mainControl.gravityUI.active = true;
-            this.scheduleOnce(() => {
+            this.mainControl.scheduleOnce(() => {
                 this.birdControl.isGravityReversed = false;
                 this.mainControl.gravityUI.active = false;
+                console.log("Het trang thai gravity");
             }, 5);
-            console.log("Trang thai grivity sau 5s:", this.birdControl.isGravityReversed);
         }, 0);
     }
 }

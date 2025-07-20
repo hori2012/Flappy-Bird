@@ -30,7 +30,7 @@ export class GhostItem extends Component {
                     c.enabled = false;
                 }
             }
-            this.scheduleOnce(() => {
+            this.mainControl.scheduleOnce(() => {
                 for (let i = 0; i < this.mainControl.pipe.length; i++) {
                     let pipeCollider = this.mainControl.pipe[i][0].getComponentsInChildren(Collider2D);
                     for (let c of pipeCollider) {
@@ -38,7 +38,8 @@ export class GhostItem extends Component {
                     }
                 }
                 this.mainControl.ghostUI.active = false;
-            }, 5);
+                console.log("Het trang thai ghost");
+            }, 2);
         }, 0);
     }
 }

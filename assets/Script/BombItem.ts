@@ -39,6 +39,7 @@ export class BombItem extends Component {
                     this.mainControl.pipe.push([pipeNode, false]);
                 }
                 this.mainControl.bombUI.active = false;
+                console.log("Het trang thai bomb");
             }, 5);
         }, 0);
     }
