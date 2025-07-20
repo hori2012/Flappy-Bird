@@ -39,7 +39,7 @@ export class GhostItem extends Component {
                 }
                 this.mainControl.ghostUI.active = false;
                 console.log("Het trang thai ghost");
-            }, 2);
+            }, 5);
         }, 0);
     }
 }
