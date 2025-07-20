@@ -103,12 +103,19 @@ export class MainControl extends Component {
                 this.gravityItem.active = false;
             }
         }
+        if (this.bombItem.active) {
+            const pos = this.bombItem.getPosition();
+            pos.x -= deltaTime * 100;
+            this.bombItem.setPosition(pos);
+            if (pos.x < -200) {
+                this.bombItem.active = false;
+            }
+        }
         this.labelScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelHightScore.node.setSiblingIndex(this.node.children.length - 1);
         this.labelWeather.node.setSiblingIndex(this.node.children.length - 1);
         this.heartUI.setSiblingIndex(this.node.children.length - 1);
         this.heartItem.setSiblingIndex(this.node.children.length - 1);
-        this.gravityItem.setSiblingIndex(this.node.children.length - 1);
     }
 
     onLoad() {
@@ -134,6 +141,8 @@ export class MainControl extends Component {
         this.heartItem.active = false;
         this.gravityItem = this.node.getChildByName("GravityItem");
         this.gravityItem.active = false;
+        this.bombItem = this.node.getChildByName("BombItem");
+        this.bombItem.active = false;
         // localStorage.setItem("hightScore", "0");
         if (localStorage.getItem("hightScore") === null) {
             localStorage.setItem("hightScore", "0");
@@ -179,51 +188,55 @@ export class MainControl extends Component {
     }
 
     onTouchResetBtn() {
-        this.btnStart.node.active = false;
-        this.btnReset.node.active = false;
-        this.btnContinue.node.active = false;
-        this.heartItem.active = false;
-        this.gameStatus = GameStatus.Game_Playing;
-        let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
-        spGameOver.node.active = false;
-        this.destroyAllPipes()
-        for (let i = 0; i < 3; i++) {
-            const pipeNode = instantiate(this.pipePrefab);
-            this.node.addChild(pipeNode);
-            const posNode = pipeNode.getPosition();
-            posNode.x = 170 + 200 * i;
-            var minY = -120;
-            var maxY = 120;
-            posNode.y = minY + Math.random() * (maxY - minY);
-            pipeNode.setPosition(posNode);
-            this.pipe.push([pipeNode, false]);
-        }
-        let bird = this.node.getChildByName("Bird");
-        let posBrid = bird.getPosition();
-        posBrid.y = 0;
-        bird.setPosition(posBrid);
-        bird.angle = 0;
-        bird.active = true;
-        const birdRigidBody = bird.getComponent(RigidBody2D);
-        if (birdRigidBody) {
-            birdRigidBody.enabled = true;
-        }
-        this.gameScore = 0;
-        this.labelScore.string = this.gameScore.toString();
-        if (localStorage.getItem("hightScore") as unknown as number < this.gameScore) {
-            localStorage.setItem("hightScore", this.gameScore.toString());
-        }
-        bird.getComponent(BirdControl).nextPipeIndex = 0;
-        this.labelHightScore.string = "Hight score: " + localStorage.getItem("hightScore");
-        this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2;
-        this.node.getChildByName("Bird").getComponent(BirdControl).heart = 3;
-        this.node.getChildByName("Bird").getComponent(BirdControl).isGravityReversed = false;
-        for (let i = 0; i < this.heartUI.children.length; i++) {
-            this.heartUI.children[i].active = true;
-        }
-        this.UnMode();
-        this.labelWeather.string = "Weather";
-        this.ModeWeather();
+        this.scheduleOnce(() => {
+            this.btnStart.node.active = false;
+            this.btnReset.node.active = false;
+            this.btnContinue.node.active = false;
+            this.heartItem.active = false;
+            this.gravityItem.active = false;
+            this.bombItem.active = false;
+            this.gameStatus = GameStatus.Game_Playing;
+            let spGameOver = this.node.getChildByName("GameOver").getComponent(Sprite);
+            spGameOver.node.active = false;
+            this.destroyAllPipes()
+            for (let i = 0; i < 3; i++) {
+                const pipeNode = instantiate(this.pipePrefab);
+                this.node.addChild(pipeNode);
+                const posNode = pipeNode.getPosition();
+                posNode.x = 170 + 200 * i;
+                var minY = -120;
+                var maxY = 120;
+                posNode.y = minY + Math.random() * (maxY - minY);
+                pipeNode.setPosition(posNode);
+                this.pipe.push([pipeNode, false]);
+            }
+            let bird = this.node.getChildByName("Bird");
+            let posBrid = bird.getPosition();
+            posBrid.y = 0;
+            bird.setPosition(posBrid);
+            bird.angle = 0;
+            bird.active = true;
+            const birdRigidBody = bird.getComponent(RigidBody2D);
+            if (birdRigidBody) {
+                birdRigidBody.enabled = true;
+            }
+            this.gameScore = 0;
+            this.labelScore.string = this.gameScore.toString();
+            if (localStorage.getItem("hightScore") as unknown as number < this.gameScore) {
+                localStorage.setItem("hightScore", this.gameScore.toString());
+            }
+            bird.getComponent(BirdControl).nextPipeIndex = 0;
+            this.labelHightScore.string = "Hight score: " + localStorage.getItem("hightScore");
+            this.node.getChildByName("Bird").getComponent(BirdControl).jumforce = 2;
+            this.node.getChildByName("Bird").getComponent(BirdControl).heart = 3;
+            this.node.getChildByName("Bird").getComponent(BirdControl).isGravityReversed = false;
+            for (let i = 0; i < this.heartUI.children.length; i++) {
+                this.heartUI.children[i].active = true;
+            }
+            this.UnMode();
+            this.labelWeather.string = "Weather";
+            this.ModeWeather();
+        }, 0);
     }
 
     destroyAllPipes() {
@@ -373,7 +386,7 @@ export class MainControl extends Component {
     }
 
     SpawItem() {
-        let numRandom = Math.floor(Math.random() * 2);
+        let numRandom = Math.floor(Math.random() * 4);
         switch (numRandom) {
             case 0:
                 if (!this.heartItem.active)
@@ -385,6 +398,7 @@ export class MainControl extends Component {
                             return;
                         }
                     }
+                break;
             case 1:
                 if (!this.gravityItem.active)
                     for (let i = 0; i < this.pipe.length; i++) {
@@ -395,6 +409,20 @@ export class MainControl extends Component {
                             return;
                         }
                     }
+                break;
+            case 2:
+                if (!this.bombItem.active)
+                    for (let i = 0; i < this.pipe.length; i++) {
+                        let pipeData = this.pipe[i];
+                        if (!pipeData[1] && pipeData[0].position.x > 0) {
+                            this.bombItem.setPosition(pipeData[0].position.x, pipeData[0].position.y);
+                            this.bombItem.active = true;
+                            return;
+                        }
+                    }
+                break;
+            default:
+                break;
         }
     }
 } 

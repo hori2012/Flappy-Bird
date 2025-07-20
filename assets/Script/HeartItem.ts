@@ -5,6 +5,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass('HeartItem')
 export class HeartItem extends Component {
+
     @property(AudioSource)
     audioPick: AudioSource = null!;
     mainControl: MainControl = null;

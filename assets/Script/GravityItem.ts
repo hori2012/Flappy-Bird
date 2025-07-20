@@ -5,6 +5,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass('GravityItem')
 export class GravityItem extends Component {
+
     @property(AudioSource)
     audioPick: AudioSource = null!;
     mainControl: MainControl = null;
